@@ -114,6 +114,44 @@
             margin-bottom: 0.5rem;
         }
         
+        /* 粉色按钮卡片样式 */
+        .pink-button-card {
+            background: linear-gradient(135deg, #FF66B2, #FF3385) !important;
+            border-left: 6px solid #FFB6D9 !important;
+            text-align: center;
+        }
+        .pink-button-card h3 {
+            color: white !important;
+        }
+        .pink-button-card p {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        /* 粉色按钮样式 */
+        .pink-button {
+            display: inline-block;
+            background-color: white;
+            color: #FF3385;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+        }
+        .pink-button:hover {
+            background-color: #FFB6D9;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        .pink-button i {
+            margin-left: 8px;
+        }
+        
         /* Footer 样式保持不变 */
         .footer {
             background: linear-gradient(135deg, #FF66B2, #FF3385);
@@ -148,9 +186,9 @@
     <main class="container">
         <!-- 下载跳转卡片 -->
         <div class="download-jump-card">
-            <h2><i class="fas fa-external-link-alt"></i> 点我跳转</h2>
+            <h2><i class="fas fa-external-link-alt"></i> 下载跳转</h2>
             <p>点击下方按钮跳转到下载页面</p>
-            <a href="./web/index.html" target="_blank">点我跳转 <i class="fas fa-arrow-right"></i></a>
+            <a href="https://待设置" target="_blank">前往下载 <i class="fas fa-arrow-right"></i></a>
         </div>
         
         <!-- Hero介绍部分 -->
@@ -166,14 +204,16 @@
             <div class="announcement-card">
                 <h3><i class="fas fa-bullhorn"></i> 下载站暂停支持的通知</h3>
                 <p>下载站暂停维护直至2026年8月</p>
-                <p> 若出现下载失败等问题，请直接联系开发者</p>
+                <p>若出现下载失败等问题，请直接联系开发者</p>
             </div>
             
-            <!-- 公告卡片2 -->
-            <div class="announcement-card">
+            <!-- 公告卡片2 - 粉色按钮卡片 -->
+            <div class="announcement-card pink-button-card">
                 <h3><i class="fas fa-newspaper"></i> 友链</h3>
                 <p>本站下载服务由雨云提供计算服务</p>
-                <a href="https://www.rainyun.com/luoqing_" target="_blank">点我跳转 <i class="fas fa-arrow-right"></i></a>
+                <a href="https://www.rainyun.com/luoqing_" target="_blank" class="pink-button">
+                    访问雨云 <i class="fas fa-external-link-alt"></i>
+                </a>
             </div>
             
             <!-- 公告卡片3 -->
@@ -187,7 +227,7 @@
     
     <footer class="footer">
         <p>© 2025 - 2026 棉尾舟下载站 | 主页</p>
-        <p>new year！！！！</p>
+        <p>new year ! ! ! </p>
     </footer>
     
     <script>
