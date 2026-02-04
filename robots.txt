@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /index.html
+Disallow: /about.html
+Disallow: /web/
+Disallow: /镜之彼端/
+Disallow: /images/
+Disallow: /
