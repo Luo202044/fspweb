@@ -5,3 +5,5 @@ Disallow: /web/
 Disallow: /镜之彼端/
 Disallow: /images/
 Disallow: /
+
+Sitemap: https://www.luoqing5203789.dpdns.org/sitemap.xml
