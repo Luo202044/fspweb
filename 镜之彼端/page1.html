@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -28,6 +28,24 @@
         .download-btn:hover { background: linear-gradient(to right, #FF3385, #FF0066); box-shadow: 0 5px 15px rgba(255, 102, 178, 0.4); }
         .disabled-link { color: #ccc !important; cursor: not-allowed; text-decoration: none !important; border-color: #eee !important; background: #f5f5f5 !important; }
         .disabled-link:hover { background: #f5f5f5 !important; color: #ccc !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
+        
+        /* 自定义弹窗样式 */
+        .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 15px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: modalFadeIn 0.3s; }
+        .modal-header { color: #B3005E; font-size: 1.5rem; margin-bottom: 1rem; text-align: center; }
+        .modal-body { color: #5A003A; margin-bottom: 1.5rem; text-align: center; }
+        .modal-footer { display: flex; justify-content: center; gap: 1rem; }
+        .modal-btn { padding: 10px 25px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .modal-btn.confirm { background: linear-gradient(to right, #FF66B2, #FF3385); color: white; }
+        .modal-btn.confirm:hover { background: linear-gradient(to right, #FF3385, #FF0066); }
+        .modal-btn.cancel { background: #f0f0f0; color: #666; }
+        .modal-btn.cancel:hover { background: #e0e0e0; }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .back-home { text-align: center; margin: 3rem 0; }
         .back-home a { display: inline-block; padding: 12px 30px; background: white; color: #FF3385; text-decoration: none; border-radius: 50px; font-weight: 600; transition: all 0.3s; border: 2px solid #FFB6D9; }
         .back-home a:hover { background: #FFB6D9; color: white; transform: translateY(-3px); }
@@ -37,6 +55,7 @@
             .nav-links a { margin: 0 0.5rem; font-size: 1rem; }
             .page-title { font-size: 2rem; }
             .software-list { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+            .modal-content { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -60,7 +79,7 @@
                 <div class="software-info">
                     <h3 class="software-title">境之彼端整合包</h3>
                     <p class="software-desc">这个是整合包</p>
-                    <a href="https://fsp1.cn-nb1.rains3.com/%E5%A2%83%E4%B9%8B%E5%BD%BC%E7%AB%AF/ATM10%20To%20the%20Sky.zip" class="download-btn" download><i class="fas fa-download"></i> 立即下载</a>
+                    <a href="https://fsp1.cn-nb1.rains3.com/%E5%A2%83%E4%B9%8B%E5%BD%BC%E7%AB%AF/ATM10%20To%20the%20Sky.zip" class="download-btn" download data-filename="ATM10 To the Sky整合包.zip"><i class="fas fa-download"></i> 立即下载</a>
                 </div>
             </div>
             <div class="software-card">
@@ -68,7 +87,7 @@
                 <div class="software-info">
                     <h3 class="software-title">模组</h3>
                     <p class="software-desc">游玩服务器所需mod，使用时解压压缩包至mods文件夹即可食用</p>
-                    <a href="https://fsp1.cn-nb1.rains3.com/%E5%A2%83%E4%B9%8B%E5%BD%BC%E7%AB%AF/%E6%A8%A1%E7%BB%84%E6%96%87%E4%BB%B6%E5%A4%B9.zip" class="download-btn disabled-link"><i class="fas fa-download"></i> 立即下载</a>
+                    <a href="#" class="download-btn disabled-link"><i class="fas fa-download"></i> 立即下载</a>
                 </div>
             </div>
             <div class="software-card">
@@ -124,14 +143,134 @@
             <a href="../index.html"><i class="fas fa-arrow-left"></i> 返回首页</a>
         </div>
     </main>
+    
+    <!-- 弹窗容器 -->
+    <div id="downloadModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">确认下载</div>
+            <div class="modal-body" id="modalMessage">
+                您确定要下载这个文件吗？
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" id="cancelBtn">取消</button>
+                <button class="modal-btn confirm" id="confirmBtn">确认下载</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="infoModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header">下载提示</div>
+            <div class="modal-body" id="infoMessage">
+                文件下载即将开始，请确保网络连接稳定。
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn confirm" id="finalConfirmBtn">开始下载</button>
+            </div>
+        </div>
+    </div>
+    
     <footer class="footer" id="about"></footer>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 为禁用的链接添加点击事件
-            document.querySelectorAll('.disabled-link').forEach(link => {
+            // 变量存储当前点击的下载链接
+            let currentDownloadLink = null;
+            let currentFileName = "";
+            
+            // 获取弹窗元素
+            const downloadModal = document.getElementById('downloadModal');
+            const infoModal = document.getElementById('infoModal');
+            const modalMessage = document.getElementById('modalMessage');
+            const infoMessage = document.getElementById('infoMessage');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const finalConfirmBtn = document.getElementById('finalConfirmBtn');
+            
+            // 显示下载确认弹窗
+            function showDownloadModal(filename) {
+                modalMessage.textContent = `您确定要下载 "${filename}" 吗？`;
+                downloadModal.style.display = 'flex';
+            }
+            
+            // 显示信息弹窗
+            function showInfoModal(filename) {
+                infoMessage.textContent = `"${filename}" 下载即将开始，请确保网络连接稳定。`;
+                infoModal.style.display = 'flex';
+            }
+            
+            // 隐藏弹窗
+            function hideModal(modal) {
+                modal.style.display = 'none';
+            }
+            
+            // 处理下载链接点击
+            document.querySelectorAll('.download-btn').forEach(link => {
                 link.addEventListener('click', function(e) {
+                    // 如果是禁用链接，显示原有错误提示
+                    if (this.classList.contains('disabled-link')) {
+                        e.preventDefault();
+                        alert('服务器错误:该资源所对应下载站链接未启用或错误');
+                        return;
+                    }
+                    
+                    // 阻止默认下载行为
                     e.preventDefault();
-                    alert('服务器错误:该资源所对应下载站链接未启用或错误');
+                    
+                    // 保存当前点击的链接和文件名
+                    currentDownloadLink = this;
+                    currentFileName = this.getAttribute('data-filename') || 
+                                     this.href.substring(this.href.lastIndexOf('/') + 1) || 
+                                     "文件";
+                    
+                    // 显示第一个确认弹窗
+                    showDownloadModal(currentFileName);
+                });
+            });
+            
+            // 第一个弹窗的取消按钮
+            cancelBtn.addEventListener('click', function() {
+                hideModal(downloadModal);
+                currentDownloadLink = null;
+            });
+            
+            // 第一个弹窗的确认按钮
+            confirmBtn.addEventListener('click', function() {
+                hideModal(downloadModal);
+                
+                // 显示第二个信息弹窗
+                setTimeout(() => {
+                    showInfoModal(currentFileName);
+                }, 300);
+            });
+            
+            // 第二个弹窗的确认按钮
+            finalConfirmBtn.addEventListener('click', function() {
+                hideModal(infoModal);
+                
+                // 触发实际下载
+                if (currentDownloadLink) {
+                    // 创建隐藏的iframe进行下载（避免页面跳转）
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = currentDownloadLink.href;
+                    document.body.appendChild(iframe);
+                    
+                    // 清理
+                    setTimeout(() => {
+                        document.body.removeChild(iframe);
+                        currentDownloadLink = null;
+                    }, 1000);
+                }
+            });
+            
+            // 点击弹窗外部关闭
+            [downloadModal, infoModal].forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        hideModal(this);
+                        currentDownloadLink = null;
+                    }
                 });
             });
             
